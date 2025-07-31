@@ -1,0 +1,8 @@
+#Read Logic (Pseudocode)
+
+def get_billing_record(record_id):
+    record = try_cosmos_db(record_id)
+    if record:
+        return record
+    # Fallback to blob storage
+    return try_blob_storage(record_id)
