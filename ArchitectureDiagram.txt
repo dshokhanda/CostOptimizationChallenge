@@ -1,0 +1,10 @@
+[Client API Calls]
+        |
+        v
+-------------------------
+|    Azure Function     |
+-------------------------
+   /               \
+  v                 v
+[Cosmos DB]    [Blob Storage]
+(≤3 months)    (>3 months, Cool/Cold)
