@@ -1,0 +1,15 @@
+Blob Lifecycle Management Command Example:
+Set up a policy to automatically move blobs older than 1 year to Archive tier for further savings
+
+
+{
+  "rules": [
+    {
+      "name": "archive-old-blobs",
+      "condition": {"age_greater_than": 365},
+      "actions": {
+        "base_blob": {"tier_to_archive": {}}
+      }
+    }
+  ]
+}
