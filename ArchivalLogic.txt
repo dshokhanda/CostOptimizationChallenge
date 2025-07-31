@@ -1,0 +1,26 @@
+# Archival Logic Pseudocode
+import datetime
+from azure.cosmos import CosmosClient
+from azure.storage.blob import BlobServiceClient
+ 
+def archive_old_records():
+    today = datetime.datetime.utcnow()
+    archive_cutoff = today - datetime.timedelta(days=90)
+    
+    # Connect to cosmos and blob storage
+    cosmos = CosmosClient(<conn_str>)
+    container = cosmos.get_database_client(<db>).get_container_client(<container>)
+    blob_service = BlobServiceClient.from_connection_string(<blob_conn_str>)
+    blob_container = blob_service.get_container_client(<archive_container>)
+    
+    # Query for old records
+    for record in container.query_items(
+        "SELECT * FROM c WHERE c.recordDate < @cutoff",
+        parameters=[{"name":"@cutoff","value":archive_cutoff.isoformat()}]
+    ):
+        # Archive to Blob Storage
+        blob_name = f"{record['id']}.json"
+        blob_container.upload_blob(blob_name, json.dumps(record), overwrite=True)
+        
+        # Delete from Cosmos after confirmation
+        container.delete_item(record['id'], partition_key=record['partitionKey'])
