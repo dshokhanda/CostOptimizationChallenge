@@ -56,3 +56,5 @@ Cost Savings: Cosmos DB stores far less data; most storage resides in much cheap
 No Downtime/Data Loss: Records are only deleted from Cosmos DB after confirmed archival.
  
 API Transparency: The API contract does not change; retrieval remains seamless for clients.
+
+**This solution offers substantial cost savings, no disruption, and no API or SLA regression, and is widely considered an Azure best practice for long-term, rarely accessed records in serverless environments.**
