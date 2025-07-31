@@ -1,0 +1,58 @@
+_________________________________________________________________
+Azure Cost Optimization Solution for Billing Records Overview:
+-----------------------------------------------------------------
+
+Given optimal cost solution is a hybrid archive architecture:
+1. Recent Records (≤3 months): Keep in Azure Cosmos DB for low-latency and seamless API access.
+2. Older Records (>3 months): Archive to Azure Blob Storage using a cost-effective tier (Cool or Cold), while providing transparent access when needed.
+
+This approach minimizes Cosmos DB storage costs without changes to your current API or system availability.
+
+
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+
+
+_______________________
+Detailed Architecture
+-----------------------
+Components
+1. Cosmos DB: Stores active, recent billing records (≤3 months old).
+2. Azure Blob Storage: Stores archived records in Cool or Cold tiers.
+3. Azure Functions: Serverless logic for seamless background archival, transparent retrieval, and API fallback.
+4. Blob Lifecycle Management: Optional rules to move even older records to lower-cost Cold or Archive tiers.
+
+
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+
+
+_______________________
+***** Data Flow *****
+-----------------------
+Ingestion: New records go to Cosmos DB as usual.
+Archival Job: A periodic Azure Function identifies and migrates records older than 3 months from Cosmos DB to Blob Storage, then deletes them from Cosmos DB after successful migration.
+
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+
+
+___________________
+***** Reads *****
+-------------------
+* For records newer than three months: Cosmos DB serves instantly.
+* For older records: 
+      -->  If not found in Cosmos DB, your Function fetches from Blob Storage, returning the record with extra (but acceptable) latency.
+
+
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----xx----
+
+________________________
+***** Key Benefits *****
+------------------------
+Cost Savings: Cosmos DB stores far less data; most storage resides in much cheaper Blob Storage tiers.
+ 
+No Downtime/Data Loss: Records are only deleted from Cosmos DB after confirmed archival.
+ 
+API Transparency: The API contract does not change; retrieval remains seamless for clients.
